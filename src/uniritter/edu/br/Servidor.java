@@ -1,36 +1,115 @@
 package uniritter.edu.br;
 
-public class Servidor{
+import java.util.ArrayList;
+import java.util.Random;
 
-	
-	int arqModificado;
-	static public int nmodif = 1;
-	static public int sinc = 1;
-	int q = 0;
-	Arquivos a = new Arquivos();
-	
-	static public boolean nmodificou() {
-		
-		return nmodif == 1;
-	}
-	
-static public boolean sinc() {
-		
-		return sinc == 1;
+public class Servidor extends Thread {
+
+	String nome;
+	static public ArrayList<Servidor> servidores = new ArrayList<>();
+	int nmodifjekyl = 1;
+	int nmodifhyde = 1;
+	boolean trancou = false;
+
+	public void criaListaServidores() {
+		Servidor jl = new Servidor();
+		Servidor hl = new Servidor();
+		jl.nome = "jekyl";
+		hl.nome = "hyde";
+		servidores.add(jl);
+		servidores.add(hl);
+
 	}
 
-	synchronized void sincroniza()   throws InterruptedException {
-		
-		 			while (nmodificou()) {
-		 				this.wait();
-		 			}
-					
-				a.hyde.get(arqModificado).setConteudo(a.jekyl.get(arqModificado).getConteudo());
-				a.hyde.get(arqModificado).setTamanho(a.jekyl.get(arqModificado).getTamanho());
+	public void run() {
+		for (int i = 0; i < Main.eAltClientes; i++) {
+
+			Random randomGenerator1 = new Random();
+			Random randomGenerator2 = new Random();
+			int sorteaDir = randomGenerator1.nextInt(2);
+			int sorteaArq = randomGenerator2.nextInt(Main.eQuantArq);
 				
-				System.out.println(a.jekyl.get(arqModificado).getConteudo());
-				System.out.println(a.hyde.get(arqModificado).getConteudo());
+				try {
 				
+					this.escritor(sorteaDir, sorteaArq);
+					this.sincroniza(sorteaDir, sorteaArq);
+				
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}					
+				
+				
+	}
+	}
+
+	synchronized void escritor(int servidor, int arq) throws InterruptedException {
+
+		Main.q.acquire();
+
+		Main.recurso.acquire();
+
+		System.out.println("Escrevendo no " + servidores.get(servidor).nome + arq);
+		Main.recurso.release();
+		System.out.println("Saiu da escrita no " + servidores.get(servidor).nome + arq);
+
+		Main.q.release();
+
+		if (servidores.get(servidor).nome == "jekyl") {
+			nmodifjekyl = 0;
+			Main.arqModificadojekyl = arq;
+		} else {
+			nmodifhyde = 0;
+			Main.arqModificadohyde = arq;
+		}
+
+		this.notifyAll();
+
+	}
+
+	synchronized void sincroniza(int servidor, int arq) throws InterruptedException {
+
+		if (servidores.get(servidor).nome == "jekyl") {
+			while (nmodifjekyl == 1) {
+				this.wait();
 			}
-	 
+
+			if (Main.arqModificadojekyl == Main.arqModificadohyde) {
+				HTTP.mutex.lock();
+				trancou = true;
+			}
+
+			System.out.println("Sincronizado no Hyde... " + Main.arqModificadojekyl);
+
+			Main.arqModificadojekyl = 1000;
+
+			if (trancou == true) {
+				HTTP.mutex.unlock();
+			}
+
+			nmodifjekyl = 1;
+
+		} else {
+			while (nmodifhyde == 1) {
+				this.wait();
+			}
+
+			if (Main.arqModificadojekyl == Main.arqModificadohyde) {
+				HTTP.mutex.lock();
+				trancou = true;
+			}
+
+			System.out.println("Sincronizado no Jekyl... " + Main.arqModificadohyde);
+
+			Main.arqModificadohyde = 2000;
+
+			if (trancou == true) {
+				HTTP.mutex.unlock();
+			}
+
+			nmodifjekyl = 1;
+		}
+
+		this.notifyAll();
+
+	}
 }

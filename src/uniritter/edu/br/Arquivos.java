@@ -13,12 +13,10 @@ public class Arquivos {
 	static public ArrayList<Arquivos> hyde = new ArrayList<>();
 	
 	void criaArquivos() {		
-										
-		Random tamanho = new Random();
-		Random randomGenerator = new Random();
-		int t = tamanho.nextInt(20);
+				
+		Random randomGenerator = new Random();		
 
-		for (int i = 0; i < t; i++) {
+		for (int i = 0; i < Main.eQuantArq; i++) {
 			int randomInt = randomGenerator.nextInt(1000);
 			Arquivos c = new Arquivos();
 			c.setNome(i + 1);
@@ -27,6 +25,7 @@ public class Arquivos {
 			jekyl.add(c);
 			hyde.add(c);
 		}	
+		
 	}	
 	
 	public int getNome() {

@@ -1,40 +1,65 @@
 package uniritter.edu.br;
 
+import java.util.ArrayList;
+import java.util.Random;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class HTTP {
-		
-	Jekyl j = new Jekyl();
-	Hyde h = new Hyde();
+public class HTTP extends Thread {
+
+	int nome;
+	int nr = 0;
 	static public ReentrantLock mutex = new ReentrantLock();
+	static public ArrayList<HTTP> lista_HTTP = new ArrayList<>();
 	
-	public void sincroniza(String servidor) throws InterruptedException {
-		if (servidor == "jekyl") {
-			j.sincroniza();
-		}else {
-			h.sincroniza();
+
+	void criaHTTPS() {
+		for (int i = 0; i < Main.equantThreadsHTTP; i++) {
+			HTTP hs = new HTTP();
+			hs.nome = i + 1;
+			lista_HTTP.add(hs);
+		}
+	}
+
+	public void run() {
+
+		for (int i = 0; i < Main.eSimulHTTP; i++) {
+			Random randomGenerator1 = new Random();
+			Random randomGenerator2 = new Random();
+			int sorteaDir = randomGenerator1.nextInt(2);
+			int sorteaArq = randomGenerator2.nextInt(Main.eQuantArq);
+
+			try {
+				this.leitor(sorteaDir, sorteaArq);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
+		}
+	}
+
+	public void leitor(int sorteaDir, int sorteaArq) throws InterruptedException {
+
+		Main.q.acquire();
+		Main.mr.acquire();
+		nr++;
+		if (nr == 1) {
+			Main.recurso.acquire();
+			System.out.println("Lendo no Jekyl... " + sorteaArq);
+		}
+		Main.mr.release();
+		Main.q.release();		
+
+		Main.mr.acquire();
+		nr--;
+		if (nr == 0) {
+			Main.recurso.release();
+			System.out.println("UNLOCKED read no Jekyl  " + sorteaArq);
 		}
 		
+		Main.mr.release();
+
 	}
-	
-	public void escreveServidor(String conteudo, String servidor, int arq) throws InterruptedException {
-		if (servidor == "jekyl") {
-			j.escritor(conteudo, arq, servidor);
-		}else
-		{
-			h.escritor(conteudo, arq, servidor);	
-	}
-	}
-	
-	public void leServidor(String servidor, int arq) throws InterruptedException {
-		if (servidor == "jekyl") {
-			j.leitor(servidor, arq);
-		}else
-		{
-			h.leitor(servidor, arq);	
-	}
-		
-	}	
-	
 }
+
+	
 
