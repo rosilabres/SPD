@@ -30,10 +30,10 @@ public class Servidor extends Thread {
 			int sorteaArq = randomGenerator2.nextInt(Main.eQuantArq);
 				
 				try {
-				
+					Main.copias[sorteaArq].acquire();
 					this.escritor(sorteaDir, sorteaArq);
 					this.sincroniza(sorteaDir, sorteaArq);
-				
+					Main.copias[sorteaArq].release();
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}					

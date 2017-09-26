@@ -14,6 +14,7 @@ public class Main {
 	static public Semaphore q = new Semaphore(1);
 	static public Semaphore recurso = new Semaphore(1);
 	static public Semaphore mr = new Semaphore(1);
+	static public Semaphore[] copias;
 
 	public static void main(String[] args) throws InterruptedException {
 
@@ -44,6 +45,13 @@ public class Main {
 		a.criaArquivos();
 		http.criaHTTPS();
 		s.criaListaServidores();
+		
+		copias = new Semaphore[eQuantArq];
+
+		for (int i = 0; i < eQuantArq; i++)
+		{
+			copias[i] = new Semaphore(1);
+		}
 
 		for (int i = 0; i < equantThreadsHTTP; i++) {
 			HTTP.lista_HTTP.get(i).start();
