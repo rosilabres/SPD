@@ -1,115 +1,35 @@
 package uniritter.edu.br;
 
-import java.util.ArrayList;
 import java.util.Random;
 
-public class Servidor extends Thread {
+public class Servidor {
 
-	String nome;
-	static public ArrayList<Servidor> servidores = new ArrayList<>();
-	int nmodifjekyl = 1;
-	int nmodifhyde = 1;
-	boolean trancou = false;
+	Random randomGenerator = new Random();
 
-	public void criaListaServidores() {
-		Servidor jl = new Servidor();
-		Servidor hl = new Servidor();
-		jl.nome = "jekyl";
-		hl.nome = "hyde";
-		servidores.add(jl);
-		servidores.add(hl);
-
-	}
-
-	public void run() {
+	void rodaServidor(vetorDeModif vm, String name, Arquivos[] arquivos) {
 		for (int i = 0; i < Main.eAltClientes; i++) {
 
-			Random randomGenerator1 = new Random();
-			Random randomGenerator2 = new Random();
-			int sorteaDir = randomGenerator1.nextInt(2);
-			int sorteaArq = randomGenerator2.nextInt(Main.eQuantArq);
-				
-				try {
-				
-					this.escritor(sorteaDir, sorteaArq);
-					this.sincroniza(sorteaDir, sorteaArq);
-				
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}					
-				
-				
-	}
-	}
-
-	synchronized void escritor(int servidor, int arq) throws InterruptedException {
-
-		Main.q.acquire();
-
-		Main.recurso.acquire();
-
-		System.out.println("Escrevendo no " + servidores.get(servidor).nome + arq);
-		Main.recurso.release();
-		System.out.println("Saiu da escrita no " + servidores.get(servidor).nome + arq);
-
-		Main.q.release();
-
-		if (servidores.get(servidor).nome == "jekyl") {
-			nmodifjekyl = 0;
-			Main.arqModificadojekyl = arq;
-		} else {
-			nmodifhyde = 0;
-			Main.arqModificadohyde = arq;
+			int sorteaArq = randomGenerator.nextInt(Main.eQuantArq);
+			try {
+				// Thread.sleep(1000*(i%10));
+				vm.get();
+				sincroniza(sorteaArq, arquivos, name);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 
-		this.notifyAll();
-
 	}
 
-	synchronized void sincroniza(int servidor, int arq) throws InterruptedException {
+	void sincroniza(int arq, Arquivos[] arquivos, String name) throws
+	 InterruptedException {
+		
+	Main.jekyllarq.arqs[arq].copias.readLock();	
+	 System.out.println("Escrevendo no ");
+	
+	 System.out.println("Saiu da escrita no");
 
-		if (servidores.get(servidor).nome == "jekyl") {
-			while (nmodifjekyl == 1) {
-				this.wait();
-			}
+	
+	 }
 
-			if (Main.arqModificadojekyl == Main.arqModificadohyde) {
-				HTTP.mutex.lock();
-				trancou = true;
-			}
-
-			System.out.println("Sincronizado no Hyde... " + Main.arqModificadojekyl);
-
-			Main.arqModificadojekyl = 1000;
-
-			if (trancou == true) {
-				HTTP.mutex.unlock();
-			}
-
-			nmodifjekyl = 1;
-
-		} else {
-			while (nmodifhyde == 1) {
-				this.wait();
-			}
-
-			if (Main.arqModificadojekyl == Main.arqModificadohyde) {
-				HTTP.mutex.lock();
-				trancou = true;
-			}
-
-			System.out.println("Sincronizado no Jekyl... " + Main.arqModificadohyde);
-
-			Main.arqModificadohyde = 2000;
-
-			if (trancou == true) {
-				HTTP.mutex.unlock();
-			}
-
-			nmodifjekyl = 1;
-		}
-
-		this.notifyAll();
-
-	}
 }

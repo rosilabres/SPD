@@ -33,32 +33,18 @@ public class HTTP extends Thread {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-
 		}
 	}
 
 	public void leitor(int sorteaDir, int sorteaArq) throws InterruptedException {
 
-		Main.q.acquire();
-		Main.mr.acquire();
-		nr++;
-		if (nr == 1) {
-			Main.recurso.acquire();
+			
 			System.out.println("Lendo no Jekyl... " + sorteaArq);
-		}
-		Main.mr.release();
-		Main.q.release();		
-
-		Main.mr.acquire();
-		nr--;
-		if (nr == 0) {
-			Main.recurso.release();
+	
+		
 			System.out.println("UNLOCKED read no Jekyl  " + sorteaArq);
 		}
-		
-		Main.mr.release();
 
-	}
 }
 
 	
