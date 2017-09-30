@@ -8,9 +8,16 @@ public class Main {
 	static int eAltClientes;
 	static int equantThreadsHTTP;
 	static int eSimulHTTP;
+<<<<<<< HEAD
 	public static Arquivos jekyllarq = new Arquivos();
 	public static Arquivos hydearq = new Arquivos();
 	
+=======
+	static public Semaphore q = new Semaphore(1);
+	static public Semaphore recurso = new Semaphore(1);
+	static public Semaphore mr = new Semaphore(1);
+	static public Semaphore[] copias;
+>>>>>>> f1fc5a7c532d80fd7ecc7d1c145dbdd8cc62acdb
 
 	public static void main(String[] args) throws InterruptedException {
 
@@ -60,6 +67,22 @@ public class Main {
 			hydeserver.rodaServidor(vmHyde, "Hyde", hydearq.arqs);
 		}).start();
 		
+<<<<<<< HEAD
+=======
+		a.criaArquivos();
+		http.criaHTTPS();
+		s.criaListaServidores();
+		
+		copias = new Semaphore[eQuantArq];
+
+		for (int i = 0; i < eQuantArq; i++)
+		{
+			copias[i] = new Semaphore(1);
+		}
+
+		for (int i = 0; i < equantThreadsHTTP; i++) {
+			HTTP.lista_HTTP.get(i).start();
+>>>>>>> f1fc5a7c532d80fd7ecc7d1c145dbdd8cc62acdb
 			
 		for (int i = 0; i < equantThreadsHTTP; i++) {
 			HTTP.lista_HTTP.get(i).start();	
