@@ -1,26 +1,25 @@
 package uniritter.edu.br;
 
-import java.util.ArrayList;
 import java.util.Random;
-import java.util.concurrent.locks.ReentrantLock;
 
-public class HTTP extends Thread {
+public class HTTP {
 
 	int nome;
 	int nr = 0;
-	static public ReentrantLock mutex = new ReentrantLock();
-	static public ArrayList<HTTP> lista_HTTP = new ArrayList<>();
-	
+	public HTTP[] lista_HTTP;
 
 	void criaHTTPS() {
+
+		lista_HTTP = new HTTP[Main.equantThreadsHTTP];
+
 		for (int i = 0; i < Main.equantThreadsHTTP; i++) {
 			HTTP hs = new HTTP();
 			hs.nome = i + 1;
-			lista_HTTP.add(hs);
+			lista_HTTP[i] = hs;
 		}
 	}
 
-	public void run() {
+	public void rodaHTTP(Arquivos[] jekyll, Arquivos[] hyde) {
 
 		for (int i = 0; i < Main.eSimulHTTP; i++) {
 			Random randomGenerator1 = new Random();
@@ -29,23 +28,23 @@ public class HTTP extends Thread {
 			int sorteaArq = randomGenerator2.nextInt(Main.eQuantArq);
 
 			try {
-				this.leitor(sorteaDir, sorteaArq);
+				if (sorteaDir == 0)
+					this.leitor(jekyll, sorteaArq, "Jekyll");
+				else
+					this.leitor(hyde, sorteaArq, "Hyde");
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
 	}
 
-	public void leitor(int sorteaDir, int sorteaArq) throws InterruptedException {
+	public void leitor(Arquivos[] arquivos, int sorteaArq, String name) throws InterruptedException {
 
-			
-			System.out.println("Lendo no Jekyl... " + sorteaArq);
-	
-		
-			System.out.println("UNLOCKED read no Jekyl  " + sorteaArq);
-		}
+		arquivos[sorteaArq].copias.readLock().lock();
+		System.out.println("Lendo no diretório " + name + " Arquivo: " + sorteaArq);
+
+		System.out.println("UNLOCKED read no diretório " + name + " Arquivo: " + sorteaArq);
+		arquivos[sorteaArq].copias.readLock().unlock();
+	}
 
 }
-
-	
-

@@ -2,14 +2,15 @@ package uniritter.edu.br;
 
 public class vetorDeModif {	
 	
-	int[] buffer = new int[Main.eQuantArq];
+	int limit = Main.eAltClientes;
+	int[] buffer = new int[limit];	
 	int np = 0, nc = 0;
 	int size = 0;
-
+	
 	synchronized
 	boolean full() {
 		
-		return size == Main.eQuantArq;
+		return size == limit;
 	}
 
 	synchronized
@@ -18,33 +19,38 @@ public class vetorDeModif {
 		return size == 0;
 	}
 	
+
 	synchronized void put(int e) throws InterruptedException {
 
 		while (full()){
-			System.out.println("Modificado");
+			
 			this.wait();
 			}
-		buffer[np++ % Main.eQuantArq] = e;
+		
+		buffer[np++ % limit] = e;
 
 		size++;
-
+		System.out.println("PMarcando para sincronizar");
 		this.notifyAll();
 	}
 
 	synchronized int get() throws InterruptedException {
-		
+
 		int e;
-	
+
 		while (empty()){
-			System.out.println("Parado");
+			
 			this.wait();
 		}
-		e = buffer[nc++ % Main.eQuantArq];
+		e = buffer[nc++ % limit];
 
 		size--;
 
 		this.notifyAll();
+		System.out.println("Pegando arquivo para sincronizar");
 		return e;
 
 	}
+
+	
 }

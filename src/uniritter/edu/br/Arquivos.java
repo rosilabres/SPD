@@ -2,6 +2,7 @@ package uniritter.edu.br;
 
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+
 public class Arquivos {
 
 	int nome;
