@@ -2,28 +2,44 @@ package uniritter.edu.br;
 
 import java.util.Random;
 
+
 public class Cliente {
-	Random randomGenerator = new Random();
+	Random randomGenerator1 = new Random();
+	Random randomGenerator2 = new Random();
+	private long threadBloqueada = 0;
+	private long tempoParada = 0;
 	
-	void rodaCliente(int eAltClientes, vetorDeModif vm, String name, Arquivos[] arquivos)
-	{
+
+	void rodaCliente(int eAltClientes, vetorDeModif vm, Arquivos[] origem) {
 		for (int i = 0; i < Main.eAltClientes; i++) {
-			
-			int sorteaArq = randomGenerator.nextInt(Main.eQuantArq);
-			 try {
-	   		arquivos[sorteaArq].copias.writeLock().lock();
-	   		System.out.println("Alterando arquivo " + sorteaArq + " no servidor " + name);
-	   		Thread.sleep(1000*(i%10));
-			arquivos[sorteaArq].setTamanho(arquivos[sorteaArq].getTamanho() + 100);
-			arquivos[sorteaArq].copias.writeLock().unlock(); 
-		    
-					vm.put(sorteaArq);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+
+			int sorteaArq = randomGenerator1.nextInt(Main.eQuantArq);
+			int tamanhoDaAtualizacao = 500 + randomGenerator2.nextInt(2000);
+			try {
+				
+				
+				origem[sorteaArq].copias.writeLock().lock();
+				System.out.println(
+						"Modificando no servidor " + origem[sorteaArq].nomediretorio + " o arquivo " + sorteaArq);
+				tempoParada = tamanhoDaAtualizacao;
+				this.threadBloqueada += tempoParada;
+				origem[sorteaArq].setTamanho(origem[sorteaArq].getTamanho() + tamanhoDaAtualizacao);
+				Thread.sleep(origem[sorteaArq].tamanho);
+				origem[sorteaArq].copias.writeLock().unlock();
+
+				vm.put(sorteaArq);
+
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
-		
+	}
+
+	public long getThreadBloqueada() {
+		return threadBloqueada;
+	}
+
+	public void setThreadBloqueada(long threadBloqueada) {
+		this.threadBloqueada = threadBloqueada;
 	}
 }
-	
-	

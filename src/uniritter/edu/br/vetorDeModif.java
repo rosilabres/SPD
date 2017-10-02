@@ -1,36 +1,31 @@
 package uniritter.edu.br;
 
-public class vetorDeModif {	
-	
+public class vetorDeModif {
+
 	int limit = Main.eAltClientes;
-	int[] buffer = new int[limit];	
+	int[] buffer = new int[limit];
 	int np = 0, nc = 0;
 	int size = 0;
-	
-	synchronized
-	boolean full() {
-		
+
+	synchronized boolean full() {
+
 		return size == limit;
 	}
 
-	synchronized
-	boolean empty() {
-		
+	synchronized boolean empty() {
+
 		return size == 0;
 	}
-	
 
 	synchronized void put(int e) throws InterruptedException {
 
-		while (full()){
-			
+		while (full()) {
 			this.wait();
-			}
-		
+		}
+
 		buffer[np++ % limit] = e;
 
 		size++;
-		System.out.println("PMarcando para sincronizar");
 		this.notifyAll();
 	}
 
@@ -38,19 +33,17 @@ public class vetorDeModif {
 
 		int e;
 
-		while (empty()){
-			
+		while (empty()) {
 			this.wait();
 		}
+
 		e = buffer[nc++ % limit];
 
 		size--;
 
 		this.notifyAll();
-		System.out.println("Pegando arquivo para sincronizar");
 		return e;
 
 	}
 
-	
 }

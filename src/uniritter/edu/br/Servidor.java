@@ -2,28 +2,66 @@ package uniritter.edu.br;
 
 public class Servidor {
 
-	void rodaServidor(vetorDeModif vm, String name, Arquivos[] origem, Arquivos[] destino) {
+	private long threadBloqueada = 0;
+	private long tempoParada = 0;
+
+	void rodaServidor(vetorDeModif vm, Arquivos[] origem, Arquivos[] destino) {
 		for (int i = 0; i < Main.eAltClientes; i++) {
 
 			try {
-				// Thread.sleep(1000*(i%10));
+
 				int alterado = vm.get();
-				sincroniza(alterado, name, origem, destino);
+				sincroniza(alterado, origem, destino);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
 	}
 
-	void sincroniza(int arq, String name, Arquivos[] origem, Arquivos[] destino) throws InterruptedException {
+	void sincroniza(int arq, Arquivos[] origem, Arquivos[] destino) throws InterruptedException {
 
+		
+		if (origem[arq].nomediretorio == "Jekyll") {
 			origem[arq].copias.readLock().lock();
 			destino[arq].copias.writeLock().lock();
 
-			System.out.println("Sincronizando no " + name + " Arquivo: " + arq);
+			tempoParada = origem[arq].tamanho;
+			this.threadBloqueada += tempoParada;
+			Thread.sleep(origem[arq].tamanho);
+			
+			System.out.println("Sincronizando no " + destino[arq].nomediretorio + " Arquivo: " + arq);
 
-			System.out.println("Sincronizou no " + name + " Arquivo: " + arq);
 			origem[arq].copias.readLock().unlock();
 			destino[arq].copias.writeLock().unlock();
+		} else {
+			destino[arq].copias.writeLock().lock();
+			origem[arq].copias.readLock().lock();
+
+			setThreadBloqueada(origem[arq].tamanho);
+			Thread.sleep(origem[arq].tamanho);
+
+			System.out.println("Sincronizando no " + destino[arq].nomediretorio + " Arquivo: " + arq);
+
+			destino[arq].copias.writeLock().unlock();
+			origem[arq].copias.readLock().unlock();
+
+		}
+
+	}
+
+	public long getThreadBloqueada() {
+		return threadBloqueada;
+	}
+
+	public void setThreadBloqueada(long threadBloqueada) {
+		this.threadBloqueada = threadBloqueada;
+	}
+
+	public long getTempoParada() {
+		return tempoParada;
+	}
+
+	public void setTempoParada(long tempoParada) {
+		this.tempoParada = tempoParada;
 	}
 }

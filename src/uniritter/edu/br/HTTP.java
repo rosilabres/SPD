@@ -2,11 +2,12 @@ package uniritter.edu.br;
 
 import java.util.Random;
 
-public class HTTP {
+public class HTTP{
 
-	int nome;
+	String nomeThread;
 	int nr = 0;
 	public HTTP[] lista_HTTP;
+	private long threadBloqueada = 0;
 
 	void criaHTTPS() {
 
@@ -14,11 +15,12 @@ public class HTTP {
 
 		for (int i = 0; i < Main.equantThreadsHTTP; i++) {
 			HTTP hs = new HTTP();
-			hs.nome = i + 1;
+			hs.nomeThread = "HTTP - "+Integer.toString(i);
 			lista_HTTP[i] = hs;
 		}
 	}
 
+	
 	public void rodaHTTP(Arquivos[] jekyll, Arquivos[] hyde) {
 
 		for (int i = 0; i < Main.eSimulHTTP; i++) {
@@ -40,11 +42,21 @@ public class HTTP {
 
 	public void leitor(Arquivos[] arquivos, int sorteaArq, String name) throws InterruptedException {
 
+		long tempoParada = arquivos[sorteaArq].tamanho; 
 		arquivos[sorteaArq].copias.readLock().lock();
-		System.out.println("Lendo no diretório " + name + " Arquivo: " + sorteaArq);
-
+		//System.out.println("Thread " + lista_HTTP[sorteaArq].nomeThread + " Lendo no diretório " + name + " Arquivo: " + sorteaArq);
+		Thread.sleep(arquivos[sorteaArq].tamanho);
+		this.threadBloqueada += tempoParada;
 		System.out.println("UNLOCKED read no diretório " + name + " Arquivo: " + sorteaArq);
 		arquivos[sorteaArq].copias.readLock().unlock();
+	}
+
+	public long getThreadBloqueada() {
+		return threadBloqueada;
+	}
+
+	public void setThreadBloqueada(long threadBloqueada) {
+		this.threadBloqueada = threadBloqueada;
 	}
 
 }
