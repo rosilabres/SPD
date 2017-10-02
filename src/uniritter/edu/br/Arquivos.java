@@ -10,25 +10,27 @@ public class Arquivos {
 	String conteudo;
 	String nomediretorio;
 	ReentrantReadWriteLock copias;
-	Random randomGenerator = new Random();
+		
+
+	public static  Arquivos[] jekyllarqs  = new Arquivos[Main.eQuantArq];
+	public static  Arquivos[] hydearqs = new Arquivos[Main.eQuantArq];
 	
 
-	public Arquivos[] arqs;
-	
-
-	void criaArquivos(String nome) {
-		arqs = new Arquivos[Main.eQuantArq];		
-
+	public static void criaArquivos() {
+		
+			
 		for (int i = 0; i < Main.eQuantArq; i++) {
+			Random randomGenerator = new Random();
+			int tamanhoarq = 50 + randomGenerator.nextInt(501);
 			Arquivos c = new Arquivos();
-			c.nomediretorio = nome;
 			c.copias = new ReentrantReadWriteLock();
 			c.nomedoarq = i + 1;
-			c.setTamanho(1);
+			c.setTamanho(tamanhoarq);
 			c.setConteudo("Vazio");
-			arqs[i] = c;
+			jekyllarqs[i] = c;
+			hydearqs[i] = c;
 		}
-
+		
 	}
 
 	public int getNome() {

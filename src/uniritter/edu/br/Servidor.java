@@ -5,20 +5,20 @@ public class Servidor {
 	private long threadBloqueada = 0;
 	private long tempoParada = 0;
 
-	void rodaServidor(vetorDeModif vm, Arquivos[] origem, Arquivos[] destino) {
+	void rodaServidor(vetorDeModif vm, Arquivos[] origem, Arquivos[] destino, String nomeorigem, String nomedestino) {
 		for (int i = 0; i < Main.eAltClientes; i++) {
 
 			try {
 
 				int alterado = vm.get();
-				sincroniza(alterado, origem, destino);
+				sincroniza(alterado, origem, destino, nomedestino);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
 	}
 
-	void sincroniza(int arq, Arquivos[] origem, Arquivos[] destino) throws InterruptedException {
+	void sincroniza(int arq, Arquivos[] origem, Arquivos[] destino, String nomedestino) throws InterruptedException {
 
 		
 		if (origem[arq].nomediretorio == "Jekyll") {
@@ -29,7 +29,7 @@ public class Servidor {
 			this.threadBloqueada += tempoParada;
 			Thread.sleep(origem[arq].tamanho);
 			
-			System.out.println("Sincronizando no " + destino[arq].nomediretorio + " Arquivo: " + arq);
+			System.out.println("Sincronizando no " + nomedestino + " Arquivo: " + arq);
 
 			origem[arq].copias.readLock().unlock();
 			destino[arq].copias.writeLock().unlock();
@@ -40,7 +40,7 @@ public class Servidor {
 			setThreadBloqueada(origem[arq].tamanho);
 			Thread.sleep(origem[arq].tamanho);
 
-			System.out.println("Sincronizando no " + destino[arq].nomediretorio + " Arquivo: " + arq);
+			System.out.println("Sincronizando no " + nomedestino + " Arquivo: " + arq);
 
 			destino[arq].copias.writeLock().unlock();
 			origem[arq].copias.readLock().unlock();

@@ -10,7 +10,7 @@ public class Cliente {
 	private long tempoParada = 0;
 	
 
-	void rodaCliente(int eAltClientes, vetorDeModif vm, Arquivos[] origem) {
+	void rodaCliente(int eAltClientes, vetorDeModif vm, Arquivos[] origem, String nomeorigem) {
 		for (int i = 0; i < Main.eAltClientes; i++) {
 
 			int sorteaArq = randomGenerator1.nextInt(Main.eQuantArq);
@@ -20,7 +20,7 @@ public class Cliente {
 				
 				origem[sorteaArq].copias.writeLock().lock();
 				System.out.println(
-						"Modificando no servidor " + origem[sorteaArq].nomediretorio + " o arquivo " + sorteaArq);
+						"Modificando no servidor " + nomeorigem + " o arquivo " + sorteaArq);
 				tempoParada = tamanhoDaAtualizacao;
 				this.threadBloqueada += tempoParada;
 				origem[sorteaArq].setTamanho(origem[sorteaArq].getTamanho() + tamanhoDaAtualizacao);

@@ -29,28 +29,25 @@ public class Main {
 		eSimulHTTP = Integer.valueOf(JOptionPane.showInputDialog(simulHTTP));
 		System.out.println("Quantidade de Arquivos: " + eSimulHTTP);
 
-		Arquivos jekyllarq = new Arquivos();
-		Arquivos hydearq = new Arquivos();
 		vetorDeModif vmJekyll = new vetorDeModif();
 		vetorDeModif vmHyde = new vetorDeModif();
 		HTTP http = new HTTP();
-		jekyllarq.criaArquivos("Jekyll");
-		hydearq.criaArquivos("Hyde");
+		Arquivos.criaArquivos();
 		http.criaHTTPS();
 
 		System.out.println("------------------------ Lista de Arquivos ------------------------");
 
 		System.out.println("Jekyll\t\tTamanho\t\tHyde\t\tTamanho");
 		for (int i = 0; i < eQuantArq; i++) {
-			System.out.println("Arquivo " + jekyllarq.arqs[i].nomedoarq + "\t" + jekyllarq.arqs[i].tamanho + "\t\t"
-					+ "Arquivo " + hydearq.arqs[i].nomedoarq + "\t" + hydearq.arqs[i].tamanho);
+			System.out.println("Arquivo " + Arquivos.jekyllarqs[i].nomedoarq + "\t" + Arquivos.jekyllarqs[i].tamanho + "\t\t"
+					+ "Arquivo " + Arquivos.hydearqs[i].nomedoarq + "\t" +  Arquivos.hydearqs[i].tamanho);
 		}
 		System.out.println("-------------------------------------------------------------------");
 
 		Cliente jekyllcliente = new Cliente();
 		
 		Thread tjekyllcliente = new Thread(() -> {
-			jekyllcliente.rodaCliente(eAltClientes, vmJekyll, jekyllarq.arqs);
+			jekyllcliente.rodaCliente(eAltClientes, vmJekyll, Arquivos.jekyllarqs, "Jekyll");
 		});
 		
 		tjekyllcliente.start();
@@ -58,7 +55,7 @@ public class Main {
 		Cliente hydecliente = new Cliente();
 		
 		Thread thydecliente = new Thread(() -> {
-			hydecliente.rodaCliente(eAltClientes, vmHyde, hydearq.arqs);
+			hydecliente.rodaCliente(eAltClientes, vmHyde, Arquivos.hydearqs, "Hyde");
 		});
 		
 		thydecliente.start();
@@ -66,7 +63,7 @@ public class Main {
 		Servidor jekyllserver = new Servidor();
 		
 		Thread tjekyllserver = new Thread(() -> {
-			jekyllserver.rodaServidor(vmJekyll, jekyllarq.arqs, hydearq.arqs);
+			jekyllserver.rodaServidor(vmJekyll, Arquivos.jekyllarqs, Arquivos.hydearqs, "Jekyl", "Hyde");
 		});
 		
 		tjekyllserver.start();
@@ -74,28 +71,37 @@ public class Main {
 		Servidor hydeserver = new Servidor();
 		
 		Thread thydeserver = new Thread(() -> {
-			hydeserver.rodaServidor(vmHyde, hydearq.arqs, jekyllarq.arqs);
+			hydeserver.rodaServidor(vmHyde, Arquivos.hydearqs, Arquivos.jekyllarqs, "Hyde", "Jekyll");
 		});
 		
 		thydeserver.start();
 		
-		for (int i = 0; i < equantThreadsHTTP; i++) {
-			String nt = Integer.toString(i);
-			
-			new Thread(() -> {	
-				Thread.currentThread().setName(nt);
-				http.rodaHTTP(jekyllarq.arqs,hydearq.arqs );
-			}).start();
+		for (int i = 0; i < equantThreadsHTTP; i++) {								
+				http.lista_HTTP[i].start();
+				Thread.currentThread().setName("HTTP - "+Integer.toString(i));
 		}
 		
-		
-		
-		
+		for (int i = 0; i < equantThreadsHTTP; i++) {
+			
+			http.lista_HTTP[i].join();
+	
+	}
+				
 		
 		tjekyllcliente.join();
 		thydecliente.join();
 		tjekyllserver.join();
 		thydeserver.join();
+		
+		
+		System.out.println("----------------- Lista de Arquivos Pós Alterações -----------------");
+
+		System.out.println("Jekyll\t\tTamanho\t\tHyde\t\tTamanho");
+		for (int i = 0; i < eQuantArq; i++) {
+			System.out.println("Arquivo " + Arquivos.jekyllarqs[i].nomedoarq + "\t" + Arquivos.jekyllarqs[i].tamanho + "\t\t"
+					+ "Arquivo " + Arquivos.hydearqs[i].nomedoarq + "\t" +  Arquivos.hydearqs[i].tamanho);
+		}
+		System.out.println("-------------------------------------------------------------------");
 		
 		
 		System.out.println("------------------------ Tempo das Threads Bloqueadas ------------------------");
