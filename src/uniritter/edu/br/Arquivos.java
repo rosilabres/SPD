@@ -24,7 +24,7 @@ public class Arquivos {
 			int tamanhoarq = 50 + randomGenerator.nextInt(501);
 			Arquivos c = new Arquivos();
 			c.copias = new ReentrantReadWriteLock();
-			c.nomedoarq = i + 1;
+			c.nomedoarq = i;
 			c.setTamanho(tamanhoarq);
 			c.setConteudo("Vazio");
 			jekyllarqs[i] = c;
